@@ -1,0 +1,154 @@
+xxixmport { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+imxport { TUser } from '@utils-types';
+import {
+  loginUserApi,
+  registerUserApi,
+  logoutApi,
+  getUserApi,
+  updateUserApi,
+  TLoginData,
+  TRegisterData
+} from '@api';
+
+type UserState = {
+  user: TUser | null;
+  isAuthChecked: boolean;
+  isLoading: boolean;
+  error: string | null;
+};
+
+const initialState: UserState = {
+  user: null,
+  isAuthChecked: false,
+  isLoading: false,
+  error: null
+};
+
+// Регистрация
+export const registerUser = createAsyncThunk(
+  'user/register',
+  async (data: TRegisterData) => {
+    const response = await registerUserApi(data);
+    return response.user;
+  }
+);
+
+// Вход
+export const loginUser = createAsyncThunk(
+  'user/login',
+  async (data: TLoginData) => {
+    const response = await loginUserApi(data);
+    localStorage.setItem('accessToken', response.accessToken);
+    localStorage.setItem('refreshToken', response.refreshToken);
+    return response.user;
+  }
+);
+
+// Выход
+export const logoutUser = createAsyncThunk('user/logout', async () => {
+  await logoutApi();
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+});
+
+// Получение пользователя
+export const getUser = createAsyncThunk('user/getUser', async () => {
+  const response = await getUserApi();
+  return response.user;
+});
+
+// Обновление пользователя
+export const updateUser = createAsyncThunk(
+  'user/update',
+  async (data: Partial<TRegisterData>) => {
+    const response = await updateUserApi(data);
+    return response.user;
+  }
+);
+
+const userSlice = createSlice({
+  name: 'user',
+  initialState,
+  reducers: {
+    authChecked: (state) => {
+      state.isAuthChecked = true;
+    }
+  },
+  extraReducers: (builder) => {
+    builder
+      // Регистрация
+      .addCase(registerUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+        state.isAuthChecked = true;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Ошибка регистрации';
+        state.isAuthChecked = true;
+      })
+
+      // Вход
+      .addCase(loginUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+        state.isAuthChecked = true;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Ошибка входа';
+        state.isAuthChecked = true;
+      })
+
+      // Выход
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+      })
+
+      // Получение пользователя
+      .addCase(getUser.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+        state.isAuthChecked = true;
+      })
+      .addCase(getUser.rejected, (state) => {
+        state.isLoading = false;
+        state.user = null;
+        state.isAuthChecked = true;
+      })
+
+      // Обновление пользователя
+      .addCase(updateUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Ошибка обновления';
+      });
+  }
+});
+
+export const { authChecked } = userSlice.actions;
+export const userReducer = userSlice.reducer;
+
+// Селекторы
+export const selectUser = (state: any) => state.user.user;
+export const selectIsAuthChecked = (state: any) => state.user.isAuthChecked;
+export const selectIsLoading = (state: any) => state.user.isLoading;
+export const selectUserError = (state: any) => state.user.error;
