@@ -1,4 +1,4 @@
-import { Routes, Route, useNavigate } from 'react-router-dom'; // добавил useNavigate
+import { Routes, Route, useLocation } from 'react-router-dom'; // Добавили useLocation
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
 import {
@@ -28,7 +28,9 @@ import { ProtectedRoute } from '../protected-route';
 
 const App = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // добавил navigate
+  const location = useLocation(); // ← Получаем текущий location
+  const backgroundLocation = location.state?.background; // ← Забираем background, если он есть
+
   const isIngredientsLoading = useSelector(selectIngredientsLoading);
   const ingredients = useSelector(selectIngredients);
   const error = useSelector(selectIngredientsError);
@@ -72,12 +74,10 @@ const App = () => {
   return (
     <div className={styles.app}>
       <AppHeader />
-      <Routes>
-        {/* Публичные маршруты */}
+      {/* Основные маршруты. Если есть background, показываем их, иначе показываем текущий location */}
+      <Routes location={backgroundLocation || location}>
         <Route path='/' element={<ConstructorPage />} />
         <Route path='/feed' element={<Feed />} />
-
-        {/* Защищённые маршруты (только для неавторизованных) */}
         <Route
           path='/login'
           element={
@@ -110,8 +110,6 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
-        {/* Защищённые маршруты (только для авторизованных) */}
         <Route
           path='/profile'
           element={
@@ -128,38 +126,49 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
-        {/* Модалки */}
-        <Route
-          path='/feed/:number'
-          element={
-            <Modal title='Детали заказа' onClose={() => navigate(-1)}>
-              <OrderInfo />
-            </Modal>
-          }
-        />
-        <Route
-          path='/ingredients/:id'
-          element={
-            <Modal title='Детали ингредиента' onClose={() => navigate(-1)}>
-              <IngredientDetails />
-            </Modal>
-          }
-        />
-        <Route
-          path='/profile/orders/:number'
-          element={
-            <ProtectedRoute>
-              <Modal title='Детали заказа' onClose={() => navigate(-1)}>
-                <OrderInfo />
-              </Modal>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* 404 */}
         <Route path='*' element={<NotFound404 />} />
       </Routes>
+
+      {/* Модалки, которые рендерятся поверх, если есть background */}
+      {backgroundLocation && (
+        <Routes>
+          <Route
+            path='/feed/:number'
+            element={
+              <Modal
+                title='Детали заказа'
+                onClose={() => window.history.back()}
+              >
+                <OrderInfo />
+              </Modal>
+            }
+          />
+          <Route
+            path='/ingredients/:id'
+            element={
+              <Modal
+                title='Детали ингредиента'
+                onClose={() => window.history.back()}
+              >
+                <IngredientDetails />
+              </Modal>
+            }
+          />
+          <Route
+            path='/profile/orders/:number'
+            element={
+              <ProtectedRoute>
+                <Modal
+                  title='Детали заказа'
+                  onClose={() => window.history.back()}
+                >
+                  <OrderInfo />
+                </Modal>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      )}
     </div>
   );
 };

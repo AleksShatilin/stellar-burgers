@@ -3,7 +3,9 @@ import { useDispatch, useSelector } from '../../services/store';
 import {
   selectBun,
   selectIngredients,
-  clearConstructor
+  clearConstructor,
+  moveIngredientUp,
+  moveIngredientDown
 } from '../../services/slices/constructorSlice';
 import {
   createOrder,
@@ -30,6 +32,14 @@ export const BurgerConstructor: FC = () => {
     ingredients: ingredients
   };
 
+  const handleMoveUp = (index: number) => {
+    dispatch(moveIngredientUp(index));
+  };
+
+  const handleMoveDown = (index: number) => {
+    dispatch(moveIngredientDown(index));
+  };
+
   const onOrderClick = () => {
     if (!user) {
       navigate('/login');
@@ -46,7 +56,7 @@ export const BurgerConstructor: FC = () => {
     ];
 
     dispatch(createOrder(ingredientsIds)).then(() => {
-      dispatch(clearConstructor()); // ← очищаем конструктор после заказа
+      dispatch(clearConstructor());
     });
   };
 
@@ -72,6 +82,8 @@ export const BurgerConstructor: FC = () => {
       orderModalData={orderModalData}
       onOrderClick={onOrderClick}
       closeOrderModal={closeOrderModal}
+      onMoveUp={handleMoveUp}
+      onMoveDown={handleMoveDown}
     />
   );
 };

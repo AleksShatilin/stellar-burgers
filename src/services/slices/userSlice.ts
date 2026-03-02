@@ -10,6 +10,7 @@ import {
   TLoginData,
   TRegisterData
 } from '@api';
+import { RootState } from '../store'; // ← добавить импорт
 
 type UserState = {
   user: TUser | null;
@@ -196,9 +197,10 @@ const userSlice = createSlice({
 export const { authChecked } = userSlice.actions;
 export const userReducer = userSlice.reducer;
 
-// Селекторы
-export const selectUser = (state: any) => state.user.user;
-export const selectUserOrders = (state: any) => state.user.orders;
-export const selectIsAuthChecked = (state: any) => state.user.isAuthChecked;
-export const selectIsLoading = (state: any) => state.user.isLoading;
-export const selectUserError = (state: any) => state.user.error;
+// Селекторы (исправлено)
+export const selectUser = (state: RootState) => state.user.user;
+export const selectUserOrders = (state: RootState) => state.user.orders;
+export const selectIsAuthChecked = (state: RootState) =>
+  state.user.isAuthChecked;
+export const selectIsLoading = (state: RootState) => state.user.isLoading;
+export const selectUserError = (state: RootState) => state.user.error;

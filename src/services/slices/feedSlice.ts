@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { TOrder, TOrdersData } from '@utils-types';
 import { getFeedsApi } from '@api';
+import { RootState } from '../store'; // ← добавить импорт
 
 type FeedState = {
   orders: TOrder[];
@@ -79,9 +80,9 @@ const feedSlice = createSlice({
 
 export const feedReducer = feedSlice.reducer;
 
-// Селекторы
-export const selectFeedOrders = (state: any) => state.feed.orders;
-export const selectFeedTotal = (state: any) => state.feed.total;
-export const selectFeedTotalToday = (state: any) => state.feed.totalToday;
-export const selectFeedLoading = (state: any) => state.feed.isLoading;
-export const selectFeedError = (state: any) => state.feed.error;
+// Селекторы (исправлено)
+export const selectFeedOrders = (state: RootState) => state.feed.orders;
+export const selectFeedTotal = (state: RootState) => state.feed.total;
+export const selectFeedTotalToday = (state: RootState) => state.feed.totalToday;
+export const selectFeedLoading = (state: RootState) => state.feed.isLoading;
+export const selectFeedError = (state: RootState) => state.feed.error;

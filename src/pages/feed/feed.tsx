@@ -9,7 +9,7 @@ export const Feed: FC = () => {
   const orders = useSelector(selectFeedOrders);
 
   useEffect(() => {
-    // dispatch(fetchFeeds()); // отключено из-за нестабильности API
+    dispatch(fetchFeeds());
   }, [dispatch]);
 
   if (!orders.length) {

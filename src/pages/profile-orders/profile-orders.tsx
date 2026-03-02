@@ -11,7 +11,7 @@ export const ProfileOrders: FC = () => {
   const orders = useSelector(selectUserOrders);
 
   useEffect(() => {
-    // dispatch(getUserOrders()); // отключено из-за нестабильности API
+    dispatch(getUserOrders());
   }, [dispatch]);
 
   return <ProfileOrdersUI orders={orders} />;

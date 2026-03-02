@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { TIngredient } from '@utils-types';
 import { getIngredientsApi } from '@api';
+import { RootState } from '../store'; // ← добавить импорт
 
 type IngredientsState = {
   ingredients: TIngredient[];
@@ -46,8 +47,10 @@ const ingredientsSlice = createSlice({
 
 export const ingredientsReducer = ingredientsSlice.reducer;
 
-// Селекторы
-export const selectIngredients = (state: any) => state.ingredients.ingredients;
-export const selectIngredientsLoading = (state: any) =>
+// Селекторы (исправлено)
+export const selectIngredients = (state: RootState) =>
+  state.ingredients.ingredients;
+export const selectIngredientsLoading = (state: RootState) =>
   state.ingredients.isLoading;
-export const selectIngredientsError = (state: any) => state.ingredients.error;
+export const selectIngredientsError = (state: RootState) =>
+  state.ingredients.error;
