@@ -7,6 +7,7 @@ import {
 } from '@zlden/react-developer-burger-ui-components';
 import { Modal } from '@components';
 import { OrderInfo } from '@components';
+import { Preloader } from '@ui';
 import { TOrder } from '@utils-types';
 import styles from './burger-constructor.module.css';
 import { BurgerConstructorUIProps } from './type';
@@ -20,7 +21,8 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = memo(
     onOrderClick,
     closeOrderModal,
     onMoveUp,
-    onMoveDown
+    onMoveDown,
+    onRemove
   }) => {
     const { bun, ingredients } = constructorItems;
 
@@ -47,6 +49,7 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = memo(
                     text={item.name}
                     price={item.price}
                     thumbnail={item.image}
+                    handleClose={() => onRemove(item.id)}
                   />
                   <div className={styles.buttons}>
                     <button
@@ -94,7 +97,8 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = memo(
             </Button>
           </div>
         </section>
-        {orderModalData && (
+        {orderRequest && <Preloader />}
+        {orderModalData && !orderRequest && (
           <Modal onClose={closeOrderModal} title='Детали заказа'>
             <OrderInfo />
           </Modal>

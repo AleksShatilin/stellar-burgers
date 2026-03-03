@@ -1,5 +1,6 @@
 import { FC, useMemo } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
+import { removeIngredient } from '../../services/slices/constructorSlice';
 import {
   selectBun,
   selectIngredients,
@@ -38,6 +39,10 @@ export const BurgerConstructor: FC = () => {
 
   const handleMoveDown = (index: number) => {
     dispatch(moveIngredientDown(index));
+  };
+
+  const handleRemove = (id: string) => {
+    dispatch(removeIngredient(id));
   };
 
   const onOrderClick = () => {
@@ -84,6 +89,7 @@ export const BurgerConstructor: FC = () => {
       closeOrderModal={closeOrderModal}
       onMoveUp={handleMoveUp}
       onMoveDown={handleMoveDown}
+      onRemove={handleRemove}
     />
   );
 };
