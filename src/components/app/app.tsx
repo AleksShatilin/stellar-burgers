@@ -1,4 +1,10 @@
-import { Routes, Route, useLocation } from 'react-router-dom'; // Добавили useLocation
+import {
+  Routes,
+  Route,
+  useLocation,
+  useParams,
+  useMatch
+} from 'react-router-dom';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
 import {
@@ -28,8 +34,13 @@ import { ProtectedRoute } from '../protected-route';
 
 const App = () => {
   const dispatch = useDispatch();
-  const location = useLocation(); // ← Получаем текущий location
-  const backgroundLocation = location.state?.background; // ← Забираем background, если он есть
+  const location = useLocation();
+  const backgroundLocation = location.state?.background;
+
+  // Получаем номер заказа из URL для страниц с деталями
+  const feedMatch = useMatch('/feed/:number')?.params?.number;
+  const profileMatch = useMatch('/profile/orders/:number')?.params?.number;
+  const orderNumber = feedMatch || profileMatch;
 
   const isIngredientsLoading = useSelector(selectIngredientsLoading);
   const ingredients = useSelector(selectIngredients);
@@ -74,7 +85,7 @@ const App = () => {
   return (
     <div className={styles.app}>
       <AppHeader />
-      {/* Основные маршруты. Если есть background, показываем их, иначе показываем текущий location */}
+      {/* Основные маршруты */}
       <Routes location={backgroundLocation || location}>
         <Route path='/' element={<ConstructorPage />} />
         <Route path='/feed' element={<Feed />} />
@@ -126,10 +137,52 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* Маршруты для прямых ссылок на детали */}
+        <Route
+          path='/ingredients/:id'
+          element={
+            <div className={styles.detailPageWrap}>
+              <p className={`text text_type_main-large ${styles.detailHeader}`}>
+                Детали ингредиента
+              </p>
+              <IngredientDetails />
+            </div>
+          }
+        />
+        <Route
+          path='/feed/:number'
+          element={
+            <div className={styles.detailPageWrap}>
+              <p
+                className={`text text_type_digits-default ${styles.detailHeader}`}
+              >
+                #{orderNumber?.padStart(6, '0')}
+              </p>
+              <OrderInfo />
+            </div>
+          }
+        />
+        <Route
+          path='/profile/orders/:number'
+          element={
+            <ProtectedRoute>
+              <div className={styles.detailPageWrap}>
+                <p
+                  className={`text text_type_digits-default ${styles.detailHeader}`}
+                >
+                  #{orderNumber?.padStart(6, '0')}
+                </p>
+                <OrderInfo />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
         <Route path='*' element={<NotFound404 />} />
       </Routes>
 
-      {/* Модалки, которые рендерятся поверх, если есть background */}
+      {/* Модалки */}
       {backgroundLocation && (
         <Routes>
           <Route

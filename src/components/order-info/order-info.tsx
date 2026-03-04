@@ -13,6 +13,11 @@ export const OrderInfo: FC = () => {
   const userOrders = useSelector(selectUserOrders);
   const ingredients = useSelector(selectIngredients);
 
+  console.log('📦 Заказы из feedSlice:', feedOrders);
+  console.log('📦 Заказы из userSlice:', userOrders);
+  console.log('🔢 Номер из URL:', number);
+  console.log('🌶️ Ингредиенты из стора:', ingredients);
+
   // Ищем заказ по номеру (сначала в ленте, потом в истории)
   const orderData = [...feedOrders, ...userOrders].find(
     (order) => order.number === Number(number)
