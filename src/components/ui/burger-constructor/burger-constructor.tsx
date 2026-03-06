@@ -1,7 +1,6 @@
 import React, { FC, memo } from 'react';
 import {
   ConstructorElement,
-  DragIcon,
   CurrencyIcon,
   Button
 } from '@zlden/react-developer-burger-ui-components';
@@ -11,6 +10,8 @@ import { Preloader } from '@ui';
 import { TOrder } from '@utils-types';
 import styles from './burger-constructor.module.css';
 import { BurgerConstructorUIProps } from './type';
+import { BurgerConstructorElement } from '../../burger-constructor-element';
+import { OrderDetailsUI } from '../order-details'; // ← добавить импорт
 
 export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = memo(
   ({
@@ -19,18 +20,15 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = memo(
     price,
     orderModalData,
     onOrderClick,
-    closeOrderModal,
-    onMoveUp,
-    onMoveDown,
-    onRemove
+    closeOrderModal
   }) => {
     const { bun, ingredients } = constructorItems;
 
     return (
       <>
         <section className={styles.burger_constructor}>
-          {bun && (
-            <div className={`${styles.element} ml-8`}>
+          {bun ? (
+            <div className={`${styles.element} ml-8 mb-4 mt-4`}>
               <ConstructorElement
                 type='top'
                 isLocked
@@ -39,40 +37,35 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = memo(
                 thumbnail={bun.image}
               />
             </div>
+          ) : (
+            <div
+              className={`${styles.noBuns} ${styles.noBunsTop} ml-8 mb-4 mr-5 text text_type_main-default`}
+            >
+              Выберите булки
+            </div>
           )}
+
           <ul className={styles.elements}>
-            {ingredients.map((item, index) => (
-              <li key={item.id} className={styles.element}>
-                <div className={styles.element_container}>
-                  <DragIcon type='primary' />
-                  <ConstructorElement
-                    text={item.name}
-                    price={item.price}
-                    thumbnail={item.image}
-                    handleClose={() => onRemove(item.id)}
-                  />
-                  <div className={styles.buttons}>
-                    <button
-                      className={styles.button}
-                      onClick={() => onMoveUp(index)}
-                      disabled={index === 0}
-                    >
-                      ↑
-                    </button>
-                    <button
-                      className={styles.button}
-                      onClick={() => onMoveDown(index)}
-                      disabled={index === ingredients.length - 1}
-                    >
-                      ↓
-                    </button>
-                  </div>
-                </div>
-              </li>
-            ))}
+            {ingredients.length > 0 ? (
+              ingredients.map((item, index) => (
+                <BurgerConstructorElement
+                  key={item.id}
+                  ingredient={item}
+                  index={index}
+                  totalItems={ingredients.length}
+                />
+              ))
+            ) : (
+              <div
+                className={`${styles.noBuns} ml-8 mb-4 mr-5 text text_type_main-default`}
+              >
+                Выберите начинку
+              </div>
+            )}
           </ul>
-          {bun && (
-            <div className={`${styles.element} ml-8`}>
+
+          {bun ? (
+            <div className={`${styles.element} ml-8 mb-4 mt-4`}>
               <ConstructorElement
                 type='bottom'
                 isLocked
@@ -81,7 +74,14 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = memo(
                 thumbnail={bun.image}
               />
             </div>
+          ) : (
+            <div
+              className={`${styles.noBuns} ${styles.noBunsBottom} ml-8 mb-4 mr-5 text text_type_main-default`}
+            >
+              Выберите булки
+            </div>
           )}
+
           <div className={styles.total}>
             <p className='text text_type_digits-medium mr-2'>
               {price} <CurrencyIcon type='primary' />
@@ -97,10 +97,16 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = memo(
             </Button>
           </div>
         </section>
-        {orderRequest && <Preloader />}
+
+        {orderRequest && (
+          <Modal onClose={closeOrderModal} title={'Оформляем заказ...'}>
+            <Preloader />
+          </Modal>
+        )}
+
         {orderModalData && !orderRequest && (
-          <Modal onClose={closeOrderModal} title='Детали заказа'>
-            <OrderInfo />
+          <Modal onClose={closeOrderModal} title={''}>
+            <OrderDetailsUI orderNumber={orderModalData.number} />
           </Modal>
         )}
       </>

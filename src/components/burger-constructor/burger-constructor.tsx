@@ -87,9 +87,6 @@ export const BurgerConstructor: FC = () => {
       orderModalData={orderModalData}
       onOrderClick={onOrderClick}
       closeOrderModal={closeOrderModal}
-      onMoveUp={handleMoveUp}
-      onMoveDown={handleMoveDown}
-      onRemove={handleRemove}
     />
   );
 };
