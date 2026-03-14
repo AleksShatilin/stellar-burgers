@@ -74,3 +74,30 @@
   width: 100%;
   max-width: 536px;
 }
+
+.buttons {
+  display: flex;
+  gap: 8px;
+  margin-left: 8px;
+}
+
+.button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: bold;
+  color: #8585ad;
+  padding: 0 6px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.button:hover {
+  color: #4c4cff;
+}
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

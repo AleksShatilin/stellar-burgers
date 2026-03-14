@@ -1,30 +1,35 @@
 import { FC, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
+import { useSelector } from '../../services/store';
+import { selectFeedOrders } from '../../services/slices/feedSlice';
+import { selectUserOrders } from '../../services/slices/userSlice';
+import { selectIngredients } from '../../services/slices/ingredientsSlice';
 import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
-import { TIngredient } from '@utils-types';
 
 export const OrderInfo: FC = () => {
-  /** TODO: взять переменные orderData и ingredients из стора */
-  const orderData = {
-    createdAt: '',
-    ingredients: [],
-    _id: '',
-    status: '',
-    name: '',
-    updatedAt: 'string',
-    number: 0
-  };
+  const { number } = useParams<{ number: string }>();
+  const feedOrders = useSelector(selectFeedOrders);
+  const userOrders = useSelector(selectUserOrders);
+  const ingredients = useSelector(selectIngredients);
 
-  const ingredients: TIngredient[] = [];
+  console.log('📦 Заказы из feedSlice:', feedOrders);
+  console.log('📦 Заказы из userSlice:', userOrders);
+  console.log('🔢 Номер из URL:', number);
+  console.log('🌶️ Ингредиенты из стора:', ingredients);
 
-  /* Готовим данные для отображения */
+  // Ищем заказ по номеру (сначала в ленте, потом в истории)
+  const orderData = [...feedOrders, ...userOrders].find(
+    (order) => order.number === Number(number)
+  );
+
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;
 
     const date = new Date(orderData.createdAt);
 
     type TIngredientsWithCount = {
-      [key: string]: TIngredient & { count: number };
+      [key: string]: (typeof ingredients)[0] & { count: number };
     };
 
     const ingredientsInfo = orderData.ingredients.reduce(
@@ -40,7 +45,6 @@ export const OrderInfo: FC = () => {
         } else {
           acc[item].count++;
         }
-
         return acc;
       },
       {}
