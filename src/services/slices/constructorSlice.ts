@@ -71,3 +71,5 @@ export const constructorReducer = constructorSlice.reducer;
 export const selectBun = (state: RootState) => state.burgerConstructor.bun;
 export const selectIngredients = (state: RootState) =>
   state.burgerConstructor.ingredients;
+
+export { initialState };
